@@ -1,6 +1,6 @@
 import { routeRobot, goalOrientedRobot, runRobot, VillageState } from './robot.js';
 
-function compareRobots(robot1, memory1, robot2, memory2) {
+export function compareRobots(robot1, memory1, robot2, memory2) {
   let steps1 = 0;
   let steps2 = 0;
   for (let i = 0; i < 100; i += 1) {
@@ -13,4 +13,4 @@ function compareRobots(robot1, memory1, robot2, memory2) {
   console.log(`${robot2.name} took an average of ${steps2 / 100} turns per task`);
 }
 
-compareRobots(routeRobot, [], goalOrientedRobot, []);
+// compareRobots(routeRobot, [], goalOrientedRobot, []);

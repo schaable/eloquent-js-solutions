@@ -31,7 +31,7 @@ function buildGraph(edges) {
   return graph;
 }
 
-var roadGraph = buildGraph(roads);
+export var roadGraph = buildGraph(roads);
 
 export var VillageState = class VillageState {
   constructor(robotCurrentLocation, parcels) {
@@ -118,7 +118,7 @@ export function routeRobot(state, memory) {
   return { direction: memory[0], memory: memory.slice(1) };
 }
 
-function findRoute(graph, from, to) {
+export function findRoute(graph, from, to) {
   let work = [{ at: from, route: [] }];
   for (let i = 0; i < work.length; i++) {
     let { at, route } = work[i];
