@@ -28,6 +28,7 @@ function locateScalpel2(nest) {
   return find(nest.name);
 }
 
+// Test cases
 locateScalpel(bigOak).then((scalpelLocation) => {
   expect(scalpelLocation).to.equal('Butcher Shop');
 });
