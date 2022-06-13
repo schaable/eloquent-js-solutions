@@ -55,9 +55,9 @@ export function parse(program) {
   return expr;
 }
 
-var specialForms = Object.create(null);
+export const specialForms = Object.create(null);
 
-function evaluate(expr, scope) {
+export function evaluate(expr, scope) {
   if (expr.type == 'value') {
     return expr.value;
   } else if (expr.type == 'word') {
