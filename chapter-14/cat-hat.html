@@ -1,0 +1,36 @@
+<style>
+  body {
+    min-height: 200px;
+  }
+</style>
+<img src="img/cat.png" id="cat" style="position: absolute" />
+<img src="img/hat.png" id="hat" style="position: absolute" />
+
+<script>
+  window.onload = () => {
+    const cat = document.querySelector('#cat');
+    const hat = document.querySelector('#hat');
+    const catCenterHeight = cat.clientHeight / 2;
+    const catCenterWidth = cat.clientWidth / 2;
+    const hatCenterHeight = hat.clientHeight / 2;
+    const hatCenterWidth = hat.clientHeight / 2;
+
+    let angle = 0;
+    let lastTime = null;
+    function animate(time) {
+      if (lastTime != null) {
+        angle += (time - lastTime) * 0.001;
+      }
+      lastTime = time;
+      const pageCenterHeight = innerHeight / 2;
+      const pageCenterWidth = innerWidth / 2;
+      cat.style.top = Math.sin(angle) * 150 - catCenterHeight + pageCenterHeight + 'px';
+      cat.style.left = Math.cos(angle) * 150 - catCenterWidth + pageCenterWidth + 'px';
+      hat.style.top = Math.sin(-angle) * 150 - catCenterHeight + pageCenterHeight + 'px';
+      hat.style.left = -Math.cos(-angle) * 150 - catCenterWidth + pageCenterWidth + 'px';
+
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  };
+</script>
