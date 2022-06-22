@@ -1,0 +1,51 @@
+<style>
+  .trail {
+    /* className for the trail elements */
+    position: absolute;
+    height: 6px;
+    width: 6px;
+    border-radius: 3px;
+    background: teal;
+  }
+  body {
+    height: 300px;
+  }
+</style>
+
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+<div class="trail"></div>
+
+<script>
+  function randomRgbColor() {
+    const x = Math.floor(Math.random() * 256);
+    const y = Math.floor(Math.random() * 256);
+    const z = Math.floor(Math.random() * 256);
+    return `rgb(${x},${y},${z})`;
+  }
+
+  let trailDivs = Array.from(document.querySelectorAll('.trail'));
+  let current = trailDivs.shift();
+  window.addEventListener('mousemove', (event) => {
+    let distX = event.clientX - 5;
+    let distY = event.clientY - 5;
+    current.style.left = event.clientX + 5 + 'px';
+    current.style.top = event.clientY + 5 + 'px';
+    current.style.backgroundColor = randomRgbColor();
+    trailDivs.push(current);
+    current = trailDivs.shift();
+  });
+</script>

@@ -1,0 +1,44 @@
+<style>
+  tab-panel button.selected {
+    font-weight: 700;
+    transform: scale(0.95);
+  }
+  tab-panel div[data-tabname] {
+    display: none;
+  }
+  tab-panel div[data-tabname].selected {
+    display: block;
+  }
+</style>
+
+<tab-panel>
+  <div data-tabname="one">Tab one</div>
+  <div data-tabname="two">Tab two</div>
+  <div data-tabname="three">Tab three</div>
+</tab-panel>
+<script>
+  function asTabs(node) {
+    const selectTab = ({ tab, button }) => {
+      // Update selected tab
+      const currentSelectedTab = node.querySelector('div[data-tabname].selected');
+      currentSelectedTab && currentSelectedTab.classList.remove('selected');
+      tab.classList.add('selected');
+      // Update selected button
+      const currentSelectedButton = node.querySelector('button.selected');
+      currentSelectedButton && currentSelectedButton.classList.remove('selected');
+      button.classList.add('selected');
+    };
+
+    const tabs = node.querySelectorAll('div[data-tabname]');
+    for (let tab of tabs) {
+      const button = document.createElement('button');
+      button.innerText = tab.getAttribute('data-tabname');
+      button.addEventListener('click', () => selectTab({ tab, button }));
+      node.insertBefore(button, tabs[0]);
+    }
+
+    node.querySelectorAll('button')[0].click();
+  }
+
+  asTabs(document.querySelector('tab-panel'));
+</script>

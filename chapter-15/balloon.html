@@ -1,0 +1,31 @@
+<p style="font-size: 10px; text-align: center">🎈</p>
+
+<script>
+  const handleBalloon = (() => {
+    let timeout;
+    return (event) => {
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+      }
+
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        const balloon = document.querySelector('p');
+        const balloonSize = parseInt(balloon.style.fontSize);
+        if (event.key === 'ArrowUp') {
+          if (balloonSize > 300) {
+            balloon.innerText = '💥';
+            window.removeEventListener('keydown', handleBalloon);
+          } else {
+            balloon.style.fontSize = `${balloonSize * 1.1}px`;
+          }
+        }
+        if (event.key === 'ArrowDown' && balloonSize > 10) {
+          balloon.style.fontSize = `${balloonSize * 0.9}px`;
+        }
+      }, 50);
+    };
+  })();
+
+  window.addEventListener('keydown', handleBalloon);
+</script>
