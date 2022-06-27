@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<script src="game.js"></script>
+<script src="levels.js"></script>
+
+<link rel="stylesheet" href="game.css" />
+
+<body>
+  <script>
+    async function runGame(plans, Display) {
+      let lives = 3;
+      for (let level = 0; level < plans.length; ) {
+        console.log(`Lives: ${lives}`);
+        let status = await runLevel(new Level(plans[level]), Display);
+        if (status == 'won') {
+          level++;
+        }
+        if (status == 'lost') {
+          lives--;
+          if (lives === 0) {
+            console.log('Game over!');
+            return;
+          }
+        }
+      }
+      console.log("You've won!");
+    }
+    runGame(GAME_LEVELS, DOMDisplay);
+  </script>
+</body>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<script src="game.js"></script>
+<script src="levels.js"></script>
+
+<link rel="stylesheet" href="game.css" />
+<style>
+  .monster {
+    background: purple;
+  }
+</style>
+
+<body>
+  <script>
+    class Monster {
+      constructor(pos) {
+        this.pos = pos;
+      }
+
+      get type() {
+        return 'monster';
+      }
+
+      static create(pos) {
+        return new Monster(pos.plus(new Vec(0, -1)));
+      }
+
+      update(time, state) {
+        const player = state.actors.find((actor) => actor.type === 'player');
+        const direction = player.pos.x < this.pos.x ? -1 : 1;
+        let newPos = this.pos.plus(new Vec(direction * time, 0));
+
+        if (state.level.touches(newPos, this.size, 'wall')) {
+          newPos = this.pos;
+        }
+
+        return new Monster(newPos);
+      }
+
+      collide(state) {
+        const player = state.actors.find((actor) => actor.type === 'player');
+        if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+          const filtered = state.actors.filter((actor) => actor !== this);
+          return new State(state.level, filtered, state.status);
+        } else {
+          return new State(state.level, state.actors, 'lost');
+        }
+      }
+    }
+
+    Monster.prototype.size = new Vec(1.2, 2);
+
+    levelChars['M'] = Monster;
+
+    runLevel(
+      new Level(`
+..................................
+.################################.
+.#..............................#.
+.#..............................#.
+.#..............................#.
+.#...........................o..#.
+.#..@...........................#.
+.##########..............########.
+..........#..o..o..o..o..#........
+..........#...........M..#........
+..........################........
+..................................
+`),
+      DOMDisplay
+    );
+  </script>
+</body>

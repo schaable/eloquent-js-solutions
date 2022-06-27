@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<script src="game.js"></script>
+<script src="levels.js"></script>
+
+<link rel="stylesheet" href="game.css" />
+
+<body>
+  <script>
+    function trackKeys(keys) {
+      let pressed = Object.create(null);
+      function track(event) {
+        if (keys.includes(event.key)) {
+          pressed[event.key] = event.type == 'keydown';
+          event.preventDefault();
+        }
+      }
+      window.addEventListener('keydown', track);
+      window.addEventListener('keyup', track);
+      function untrack() {
+        window.removeEventListener('keydown', track);
+        window.removeEventListener('keyup', track);
+      }
+      return { pressed, untrack };
+    }
+
+    function runLevel(level, Display) {
+      let display = new Display(document.body, level);
+      let state = State.start(level);
+      let ending = 1;
+      let paused = false;
+      const trackedKeys = trackKeys(['ArrowLeft', 'ArrowRight', 'ArrowUp']);
+
+      return new Promise((resolve) => {
+        function animationFunc(time) {
+          state = state.update(time, trackedKeys.pressed);
+          display.syncState(state);
+          if (paused) {
+            return false;
+          } else if (state.status == 'playing') {
+            return true;
+          } else if (ending > 0) {
+            ending -= time;
+            return true;
+          } else {
+            display.clear();
+            trackedKeys.untrack();
+            window.removeEventListener('keydown', pauseHandler);
+            resolve(state.status);
+            return false;
+          }
+        }
+
+        function pauseHandler(event) {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            paused = !paused;
+
+            if (!paused) {
+              runAnimation(animationFunc);
+            }
+          }
+        }
+        window.addEventListener('keydown', pauseHandler);
+
+        runAnimation(animationFunc);
+      });
+    }
+
+    runGame(GAME_LEVELS, DOMDisplay);
+  </script>
+</body>
