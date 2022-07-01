@@ -1,0 +1,97 @@
+<canvas width="600" height="200"></canvas>
+<script>
+  let cx = document.querySelector('canvas').getContext('2d');
+
+  function drawPolygon(cx, vertices, fillColor) {
+    cx.beginPath();
+    vertices.forEach(([x, y]) => {
+      cx.lineTo(x, y);
+    });
+    cx.closePath();
+
+    if (fillColor) {
+      cx.fillStyle = fillColor;
+      cx.fill();
+    } else {
+      cx.stroke();
+    }
+  }
+
+  function drawLine(cx, vertices) {
+    cx.beginPath();
+    vertices.forEach(([x, y]) => {
+      cx.lineTo(x, y);
+    });
+    cx.stroke();
+  }
+
+  function drawSpiral(cx, center, radius, radiusInc = 0.1, angleInc = 0.05) {
+    const total = 2 * Math.PI;
+    cx.beginPath();
+    for (let i = 0, j = 0; i <= radius; i += radiusInc, j += angleInc) {
+      cx.arc(center.x, center.y, i, j, j + angleInc);
+    }
+    cx.stroke();
+  }
+
+  function drawStar(cx, center, radius, points) {
+    cx.beginPath();
+    cx.moveTo(center.x + radius * Math.cos(0), center.y + radius * Math.sin(0));
+    for (let i = 1; i <= points; i += 1) {
+      cx.quadraticCurveTo(
+        center.x,
+        center.y,
+        center.x + radius * Math.cos((i * 2 * Math.PI) / points),
+        center.y + radius * Math.sin((i * 2 * Math.PI) / points)
+      );
+    }
+    cx.fillStyle = 'orange';
+    cx.fill();
+  }
+
+  drawPolygon(cx, [
+    [20, 10],
+    [50, 10],
+    [60, 40],
+    [10, 40],
+  ]);
+
+  drawPolygon(cx, [
+    [70, 10],
+    [110, 10],
+    [120, 25],
+    [80, 50],
+    [95, 23],
+  ]);
+
+  drawPolygon(
+    cx,
+    [
+      [150, 10],
+      [170, 30],
+      [150, 50],
+      [130, 30],
+    ],
+    'red'
+  );
+
+  drawLine(cx, [
+    [180, 10],
+    [230, 15],
+    [180, 20],
+    [230, 25],
+    [180, 30],
+    [230, 35],
+    [180, 40],
+    [230, 45],
+    [180, 50],
+    [230, 55],
+    [180, 60],
+    [230, 65],
+    [180, 70],
+  ]);
+
+  drawSpiral(cx, { x: 290, y: 50 }, 52);
+
+  drawStar(cx, { x: 390, y: 50 }, 40, 8);
+</script>
