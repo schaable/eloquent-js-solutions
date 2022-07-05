@@ -1,0 +1,50 @@
+<canvas width="400" height="400"></canvas>
+<script>
+  let cx = document.querySelector('canvas').getContext('2d');
+
+  let lastTime = null;
+  let boxXStart = 10,
+    boxXEnd = 350,
+    boxYStart = 10,
+    boxYEnd = 200;
+  let posX = Math.floor(Math.random() * 300 + 15),
+    posY = Math.floor(Math.random() * 150 + 15),
+    radius = 7,
+    speed = 100,
+    directionX = 1,
+    directionY = 1;
+  function frame(time) {
+    if (lastTime != null) {
+      updateAnimation(Math.min(100, time - lastTime) / 1000);
+    }
+    lastTime = time;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  function updateAnimation(step) {
+    cx.beginPath();
+    cx.lineTo(boxXStart, boxYStart);
+    cx.lineTo(boxXEnd, boxYStart);
+    cx.lineTo(boxXEnd, boxYEnd);
+    cx.lineTo(boxXStart, boxYEnd);
+    cx.closePath();
+    cx.lineWidth = 10;
+    cx.strokeStyle = 'DarkSlateBlue';
+    cx.stroke();
+    cx.beginPath();
+    cx.clearRect(posX - radius - 0.5, posY - radius - 0.5, (radius + 0.5) * 2, (radius + 0.5) * 2);
+    posX = posX + speed * directionX * step;
+    posY = posY + speed * directionY * step;
+    if (posX >= boxXEnd - 12 || posX <= boxXStart + 12) {
+      directionX *= -1;
+    }
+    if (posY >= boxYEnd - 12 || posY <= boxYStart + 12) {
+      directionY *= -1;
+    }
+    cx.arc(posX, posY, radius, 0, 2 * Math.PI);
+    cx.fillStyle = 'LightSeaGreen';
+    cx.fill();
+    cx.closePath();
+  }
+</script>
