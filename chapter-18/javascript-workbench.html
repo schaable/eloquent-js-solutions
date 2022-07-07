@@ -1,0 +1,21 @@
+<textarea id="code">return "hi";</textarea>
+<button id="button">Run</button>
+<pre id="output"></pre>
+
+<script>
+  const button = document.querySelector('#button');
+  const editor = document.querySelector('#code');
+  const output = document.querySelector('#output');
+
+  const isObject = (value) => value !== null && typeof value === 'object';
+  button.addEventListener('click', () => {
+    try {
+      const fn = Function(editor.value);
+      const returnValue = fn();
+      // Javascript Arrays are also objects, but it doesn't matter because it is safe to use stringify on them
+      output.textContent = isObject(returnValue) ? JSON.stringify(returnValue) : String(returnValue);
+    } catch (e) {
+      output.textContent = e.message;
+    }
+  });
+</script>

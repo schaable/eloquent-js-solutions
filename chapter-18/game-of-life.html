@@ -1,0 +1,158 @@
+<div id="rules">
+  <p>
+    The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John
+    Horton Conway in 1970.[1] It is a zero-player game,[2][3] meaning that its evolution is determined by its initial
+    state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and
+    observing how it evolves. It is Turing complete and can simulate a universal constructor or any other Turing
+    machine.
+  </p>
+  <p>
+    Rules:
+    <ol>
+      <li>Any live cell with two or three live neighbours survives.</li>
+      <li>Any dead cell with three live neighbours becomes a live cell.</li>
+      <li>All other live cells die in the next generation. Similarly, all other dead cells stay dead.</li>
+    </ol>
+  </p>
+</div>
+<div id="settings">
+  <label for="size">Grid size: </label>
+  <input type="text" id="size" />
+  <button id="start">Start</button>
+</div>
+<div id="game" style="display: none">
+  <div style="display: flex; gap: 10px; margin-bottom: 15px">
+    <div style="display: none">
+      <label for="previous-grid">Previous state</label>
+      <fieldset id="previous-grid" disabled style="border: solid 1px black"></fieldset>
+    </div>
+    <div>
+      <label for="grid">Current state</label>
+      <fieldset id="grid" style="border: solid 1px black"></fieldset>
+    </div>
+  </div>
+  <button id="next">Next generation</button>
+  <button id="auto">Auto</button>
+</div>
+
+<script>
+  const gameOfLife = (size) => {
+    const state = [...Array(size)].map(() => [...Array(size)].map(() => Math.floor(Math.random() * 2)));
+
+    function draw(container) {
+      // First empty the container
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      const { state } = this;
+
+      for (let i = 0; i < state.length; i++) {
+        const row = state[i];
+        const rowDiv = document.createElement('div');
+        for (let j = 0; j < row.length; j++) {
+          const cell = row[j];
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = !!cell;
+          checkbox.addEventListener('change', () => {
+            state[i][j] = checkbox.checked ? 1 : 0;
+          });
+          rowDiv.appendChild(checkbox);
+        }
+        container.appendChild(rowDiv);
+      }
+    }
+
+    function next() {
+      const nextState = [...Array(size)].map(() => [...Array(size)]);
+      const { state } = this;
+
+      for (let i = 0; i < state.length; i++) {
+        const prevRow = state[i - 1] ?? [];
+        const row = state[i];
+        const nextRow = state[i + 1] ?? [];
+        for (let j = 0; j < row.length; j++) {
+          const liveNeighbors =
+            (prevRow[j - 1] ?? 0) +
+            (prevRow[j] ?? 0) +
+            (prevRow[j + 1] ?? 0) +
+            (row[j - 1] ?? 0) +
+            (row[j + 1] ?? 0) +
+            (nextRow[j - 1] ?? 0) +
+            (nextRow[j] ?? 0) +
+            (nextRow[j + 1] ?? 0);
+          // Cell keeps living if it has 2 or 3 neighbors alive.
+          // Dead cell becomes alive with 3 live neighbors.
+          nextState[i][j] = (liveNeighbors === 2 && row[j]) || liveNeighbors === 3 ? 1 : 0;
+        }
+      }
+
+      return {
+        state: nextState,
+        draw,
+        next,
+      };
+    }
+
+    return {
+      state,
+      draw,
+      next,
+    };
+  };
+
+  const startBtn = document.querySelector('#start');
+  startBtn.addEventListener('click', () => {
+    const sizeInput = document.querySelector('#size');
+    const gridSize = Number(sizeInput.value);
+    if (gridSize === 0 || isNaN(gridSize)) {
+      alert("Please enter a number for 'Grid size'");
+      return;
+    }
+    const settingsDiv = document.querySelector('#settings');
+    settingsDiv.remove();
+
+    const gameDiv = document.querySelector('#game');
+    gameDiv.style.display = 'block';
+
+    const previousGrid = document.querySelector('#previous-grid');
+    const currentGrid = document.querySelector('#grid');
+    let game = gameOfLife(gridSize);
+
+    function cycleGame() {
+      game.draw(previousGrid);
+      game = game.next();
+      game.draw(currentGrid);
+    }
+
+    cycleGame();
+
+    const nextBtn = document.querySelector('#next');
+    nextBtn.addEventListener('click', () => {
+      previousGrid.parentNode.style.display = 'block';
+      cycleGame();
+    });
+
+    const autoBtn = document.querySelector('#auto');
+    let running = false;
+    let interval;
+    autoBtn.addEventListener('click', () => {
+      if (running) {
+        currentGrid.disabled = false;
+        nextBtn.disabled = false;
+        autoBtn.textContent = 'Auto';
+        clearInterval(interval);
+        running = false;
+      } else {
+        currentGrid.disabled = true;
+        nextBtn.disabled = true;
+        autoBtn.textContent = 'Stop';
+        cycleGame();
+        interval = setInterval(() => {
+          cycleGame();
+        }, 2000);
+        running = true;
+      }
+    });
+  });
+</script>
