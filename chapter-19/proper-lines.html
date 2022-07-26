@@ -7,7 +7,8 @@
   function draw(pos, state, dispatch) {
     let prev = pos;
     function drawPixel(pos, state) {
-      line(prev, pos, state, dispatch);
+      const drawn = [{ x: pos.x, y: pos.y, color: state.color }, ...drawLine(prev, pos, state.color)];
+      dispatch({ picture: state.picture.draw(drawn) });
       if (pos != prev) {
         prev = pos;
       }
@@ -16,37 +17,41 @@
     return drawPixel;
   }
 
-  const aroundDiag = [
-    { dx: -1, dy: 0 },
-    { dx: 1, dy: 0 },
-    { dx: 0, dy: -1 },
-    { dx: 0, dy: 1 },
-    { dx: -1, dy: -1 },
-    { dx: -1, dy: 1 },
-    { dx: 1, dy: -1 },
-    { dx: 1, dy: 1 },
-  ];
+  function drawLine(start, end, color) {
+    const drawn = [];
+    const xDiff = Math.abs(start.x - end.x);
+    const yDiff = Math.abs(start.y - end.y);
 
-  function line(start, end, state, dispatch) {
-    const fullDistance = Math.floor(Math.sqrt((start.x - end.x) ** 2 + (start.y - end.y) ** 2));
-    const drawn = [{ x: start.x, y: start.y, color: state.color, distance: fullDistance }];
-
-    for (let done = 0; done < drawn.length; done++) {
-      const distances = [];
-      for (let { dx, dy } of aroundDiag) {
-        const x = drawn[done].x + dx;
-        const y = drawn[done].y + dy;
-        distances.push({ x, y, distance: Math.sqrt((x - end.x) ** 2 + (y - end.y) ** 2) });
+    if (xDiff > yDiff) {
+      // horizontal-ish line
+      if (start.x > end.x) {
+        [start, end] = [end, start];
       }
-      const minDistance = distances.reduce(
-        (min, curr) => (curr.distance < fullDistance && curr.distance < min.distance ? curr : min),
-        distances[0]
-      );
-      if (drawn[done].distance > minDistance.distance) {
-        drawn.push({ x: minDistance.x, y: minDistance.y, color: state.color, distance: minDistance.distance });
+      const m = (end.y - start.y) / (end.x - start.x);
+
+      for (let step = 1; step <= xDiff; step++) {
+        drawn.push({ x: start.x + step, y: Math.floor(start.y + m * step), color });
+      }
+    } else {
+      // vertical-ish line
+      if (start.y > end.y) {
+        [start, end] = [end, start];
+      }
+      const m = (end.x - start.x) / (end.y - start.y);
+
+      for (let step = 1; step <= yDiff; step++) {
+        drawn.push({ x: Math.floor(start.x + m * step), y: start.y + step, color });
       }
     }
-    dispatch({ picture: state.picture.draw(drawn) });
+
+    return drawn;
+  }
+
+  function line(start, state, dispatch) {
+    return (end) => {
+      const drawn = drawLine(start, end, state.color);
+      dispatch({ picture: state.picture.draw(drawn) });
+    };
   }
 
   let dom = startPixelEditor({
