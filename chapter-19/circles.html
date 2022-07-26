@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<script src="paint.js"></script>
+
+<div></div>
+<script>
+  function circle(center, state, dispatch) {
+    function drawCircle(pos) {
+      const radius = Math.floor(Math.sqrt((center.x - pos.x) ** 2 + (center.y - pos.y) ** 2));
+
+      let drawn = [];
+      for (let y = 0; y < state.picture.height; y++) {
+        for (let x = 0; x < state.picture.width; x++) {
+          const distance = Math.sqrt((center.x - x) ** 2 + (center.y - y) ** 2);
+          if (distance < radius) {
+            drawn.push({ x, y, color: state.color });
+          }
+        }
+      }
+      dispatch({ picture: state.picture.draw(drawn) });
+    }
+    drawCircle(center);
+    return drawCircle;
+  }
+
+  let dom = startPixelEditor({
+    tools: Object.assign({}, baseTools, { circle }),
+  });
+  document.querySelector('div').appendChild(dom);
+</script>
