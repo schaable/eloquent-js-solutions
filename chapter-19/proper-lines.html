@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<script src="paint.js"></script>
+
+<div></div>
+<script>
+  function draw(pos, state, dispatch) {
+    let prev = pos;
+    function drawPixel(pos, state) {
+      line(prev, pos, state, dispatch);
+      if (pos != prev) {
+        prev = pos;
+      }
+    }
+    drawPixel(pos, state);
+    return drawPixel;
+  }
+
+  const aroundDiag = [
+    { dx: -1, dy: 0 },
+    { dx: 1, dy: 0 },
+    { dx: 0, dy: -1 },
+    { dx: 0, dy: 1 },
+    { dx: -1, dy: -1 },
+    { dx: -1, dy: 1 },
+    { dx: 1, dy: -1 },
+    { dx: 1, dy: 1 },
+  ];
+
+  function line(start, end, state, dispatch) {
+    const fullDistance = Math.floor(Math.sqrt((start.x - end.x) ** 2 + (start.y - end.y) ** 2));
+    const drawn = [{ x: start.x, y: start.y, color: state.color, distance: fullDistance }];
+
+    for (let done = 0; done < drawn.length; done++) {
+      const distances = [];
+      for (let { dx, dy } of aroundDiag) {
+        const x = drawn[done].x + dx;
+        const y = drawn[done].y + dy;
+        distances.push({ x, y, distance: Math.sqrt((x - end.x) ** 2 + (y - end.y) ** 2) });
+      }
+      const minDistance = distances.reduce(
+        (min, curr) => (curr.distance < fullDistance && curr.distance < min.distance ? curr : min),
+        distances[0]
+      );
+      if (drawn[done].distance > minDistance.distance) {
+        drawn.push({ x: minDistance.x, y: minDistance.y, color: state.color, distance: minDistance.distance });
+      }
+    }
+    dispatch({ picture: state.picture.draw(drawn) });
+  }
+
+  let dom = startPixelEditor({
+    tools: { draw, line, fill, rectangle, pick },
+  });
+  document.querySelector('div').appendChild(dom);
+</script>
