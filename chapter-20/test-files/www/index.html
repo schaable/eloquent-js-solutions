@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A public space on the web</title>
+    <link rel="stylesheet" href="./index.css" />
+    <script src="./index.js"></script>
+  </head>
+  <body>
+    <form id="web-editor">
+      <label for="files">File: </label>
+      <select name="files" id="files">
+        <option value="index.html">index.html</option>
+        <option value="eloquentjs.html">eloquentjs.html</option>
+        <option value="index.js">index.js</option>
+        <option value="index.css">index.css</option>
+      </select>
+      <textarea name="file-contents" id="file-contents"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </body>
+</html>
