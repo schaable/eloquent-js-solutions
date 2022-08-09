@@ -1,6 +1,8 @@
 import { createServer } from 'http';
+import { writeFileSync } from 'fs';
 import handler from 'serve-handler';
 import Router from './router.js';
+import database from './db.json' assert { type: 'json' };
 
 var router = new Router();
 var defaultHeaders = { 'Content-Type': 'text/plain' };
@@ -32,6 +34,7 @@ var SkillShareServer = class SkillShareServer {
     this.server.listen(port);
   }
   stop() {
+    writeFileSync('./db.json', JSON.stringify(this.talks));
     this.server.close();
   }
 };
@@ -141,4 +144,10 @@ SkillShareServer.prototype.updated = function () {
   this.waiting = [];
 };
 
-new SkillShareServer(Object.create(null)).start(8000);
+const server = new SkillShareServer(database);
+server.start(8000);
+
+process.on('SIGINT', () => {
+  server.stop();
+  process.exit(0);
+});
