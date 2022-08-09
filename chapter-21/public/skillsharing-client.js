@@ -71,7 +71,7 @@ function elt(type, props, ...children) {
 function renderTalk(talk, dispatch) {
   return elt(
     'section',
-    { className: 'talk' },
+    { className: 'talk', id: talk.id },
     elt(
       'h2',
       null,
@@ -90,7 +90,7 @@ function renderTalk(talk, dispatch) {
     ),
     elt('div', null, 'by ', elt('strong', null, talk.presenter)),
     elt('p', null, talk.summary),
-    ...talk.comments.map(renderComment),
+    elt('section', { className: 'comments' }, ...talk.comments.map(renderComment)),
     elt(
       'form',
       {
@@ -109,7 +109,7 @@ function renderTalk(talk, dispatch) {
 }
 
 function renderComment(comment) {
-  return elt('p', { className: 'comment' }, elt('strong', null, comment.author), ': ', comment.message);
+  return elt('p', { className: 'comment', id: comment.id }, elt('strong', null, comment.author), ': ', comment.message);
 }
 
 function renderTalkForm(dispatch) {
@@ -155,14 +155,33 @@ var SkillShareApp = class SkillShareApp {
     this.dispatch = dispatch;
     this.talkDOM = elt('div', { className: 'talks' });
     this.dom = elt('div', null, renderUserField(state.user, dispatch), this.talkDOM, renderTalkForm(dispatch));
+    this.talks = [];
     this.syncState(state);
   }
 
   syncState(state) {
     if (state.talks != this.talks) {
-      this.talkDOM.textContent = '';
-      for (let talk of state.talks) {
-        this.talkDOM.appendChild(renderTalk(talk, this.dispatch));
+      // update / add talks
+      for (let stateTalk of state.talks) {
+        const talk = this.talks.find(({ id }) => id === stateTalk.id);
+        if (talk) {
+          if (talk.comments.length < stateTalk.comments.length) {
+            const commentsContainer = this.talkDOM.querySelector(`#${stateTalk.id} .comments`);
+            for (let i = talk.comments.length; i < stateTalk.comments.length; i++) {
+              const comment = stateTalk.comments[i];
+              commentsContainer.appendChild(renderComment(comment));
+            }
+          }
+        } else {
+          this.talkDOM.appendChild(renderTalk(stateTalk, this.dispatch));
+        }
+      }
+      // remove deleted talks
+      for (let talk of this.talks) {
+        if (!state.talks.some(({ id }) => id === talk.id)) {
+          const talkNode = document.getElementById(talk.id);
+          this.talkDOM.removeChild(talkNode);
+        }
       }
       this.talks = state.talks;
     }

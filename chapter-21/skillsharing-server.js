@@ -1,6 +1,7 @@
 import { createServer } from 'http';
 import { writeFileSync } from 'fs';
 import handler from 'serve-handler';
+import { v4 as uuidv4 } from 'uuid';
 import Router from './router.js';
 import database from './db.json' assert { type: 'json' };
 
@@ -78,7 +79,7 @@ router.add('PUT', talkPath, async (server, title, request) => {
   if (!talk || typeof talk.presenter != 'string' || typeof talk.summary != 'string') {
     return { status: 400, body: 'Bad talk data' };
   }
-  server.talks[title] = { title, presenter: talk.presenter, summary: talk.summary, comments: [] };
+  server.talks[title] = { id: uuidv4(), title, presenter: talk.presenter, summary: talk.summary, comments: [] };
   server.updated();
   return { status: 204 };
 });
@@ -95,7 +96,7 @@ router.add('POST', /^\/talks\/([^\/]+)\/comments$/, async (server, title, reques
   if (!comment || typeof comment.author != 'string' || typeof comment.message != 'string') {
     return { status: 400, body: 'Bad comment data' };
   } else if (title in server.talks) {
-    server.talks[title].comments.push(comment);
+    server.talks[title].comments.push({ id: uuidv4(), ...comment });
     server.updated();
     return { status: 204 };
   } else {
